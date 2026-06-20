@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transition of the Celestial Bodies</title>
+    <style>
+        :root {
+            --space-bg: #0b0c10;
+            --text-color: #ffffff;
+            --accent-color: #66fcf1;
+            --secondary-color: #45a29e;
+            --input-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--space-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        /* Starry Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: linear-gradient(to bottom, #020111 0%, #20143a 100%);
+        }
+
+        canvas#star-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Screens */
+        #settings-screen {
+            padding: 10px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #animation-screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        h1.main-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+            align-self: center;
+        }
+
+        .horoscope-section {
+            width: 100%;
+            border: 1px solid rgba(102, 252, 241, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .horoscope-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .form-row label {
+            width: 120px;
+            font-weight: bold;
+            font-size: 0.95em;
+            white-space: nowrap;
+        }
+
+        .zodiac-radios {
+            display: flex;
+            gap: 3px;
+            flex-wrap: nowrap;
+            margin-right: 12px;
+        }
+
+        .zodiac-radios label {
+            width: auto;
+            cursor: pointer;
+            padding: 2px 4px;
+            background: var(--input-bg);
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .zodiac-radios input:checked+span {
+            color: var(--accent-color);
+            font-weight: bold;
+            text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            transform: scale(1.2);
+            display: inline-block;
+        }
+
+        .degree-input {
+            width: 50px;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 3px 5px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .retrograde-label {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        button.generate-btn {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            align-self: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.6);
+            flex-shrink: 0;
+        }
+
+        button.generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(102, 252, 241, 0.8);
+        }
+
+        /* Animation Screen Layout */
+        #anim-header {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #anim-header h1 {
+            color: white;
+            text-shadow: 0 0 10px yellow, 0 0 20px yellow, 0 0 30px #ffaa00;
+        }
+
+        #anim-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #anim-left-panel {
+            width: 48%;
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .info-column {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(102, 252, 241, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .info-column h2 {
+            font-size: 1.2rem;
+            color: white;
+            text-shadow: 0 0 10px yellow, 0 0 20px #ffaa00;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 0, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 30px 105px 30px 85px 1fr;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.02);
+            color: white;
+            text-shadow: none;
+        }
+
+        .info-grid-house {
+            display: grid;
+            grid-template-columns: 80px 30px 85px 1fr;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.02);
+            color: white;
+            text-shadow: none;
+        }
+
+        .info-symbol {
+            font-size: 1.2rem;
+            text-align: center;
+            text-shadow: none;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.2;
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .blinking {
+            animation: blink 0.8s infinite;
+        }
+
+        #anim-right-panel {
+            width: 52%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #horoscope-canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .animated-planet {
+            position: fixed;
+            font-size: 26px;
+            font-weight: bold;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+            z-index: 100;
+        }
+
+        .animated-planet.css-move {
+            transition: left 3s cubic-bezier(0.25, 0.1, 0.25, 1), top 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars">
+        <canvas id="star-canvas"></canvas>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div id="settings-screen">
+        <h1 class="main-title">Transition of the Celestial Bodies</h1>
+
+        <div class="form-section" style="align-self: center; margin-bottom: 10px;">
+            <div class="form-row">
+                <label>Title:</label>
+                <input type="text" id="input-title" value="My Horoscope Animation"
+                    style="width: 300px; padding: 5px; background: var(--input-bg); color: white; border: 1px solid rgba(255,255,255,0.3);">
+            </div>
+        </div>
+
+        <div class="form-section" style="align-self: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <div style="display: flex; gap: 20px;">
+                <div class="form-row" style="margin: 0; flex-direction: column; align-items: flex-start;">
+                    <label for="timeA" style="width: auto; margin-bottom: 5px; color: var(--accent-color); font-size: 1.1em;">Date & Time A (Initial)</label>
+                    <input type="datetime-local" id="timeA" class="datetime-input" required style="padding: 10px; font-size: 1.1em; background: var(--input-bg); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; width: 250px;">
+                </div>
+                <div class="form-row" style="margin: 0; flex-direction: column; align-items: flex-start;">
+                    <label for="timeC" style="width: auto; margin-bottom: 5px; color: var(--accent-color); font-size: 1.1em;">Date & Time C (Final)</label>
+                    <input type="datetime-local" id="timeC" class="datetime-input" required style="padding: 10px; font-size: 1.1em; background: var(--input-bg); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; width: 250px;">
+                </div>
+            </div>
+            
+            <button class="generate-btn" style="padding: 10px 20px; font-size: 1rem; margin: 0;" onclick="calculateTimeB()">Calculate Time B</button>
+            
+            <div id="resultBox" style="display: none; width: 100%; text-align: center; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid var(--secondary-color);">
+                <div style="color: var(--secondary-color); font-size: 1.1em; margin-bottom: 10px;">Time B (Just before C, matching Ascendant A)</div>
+                <div id="resultTime" style="color: var(--accent-color); font-size: 1.5em; font-weight: bold; margin-bottom: 10px; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);"></div>
+                <div id="resultInterval" style="font-size: 1.1em; color: #fff;"></div>
+            </div>
+        </div>
+
+        <!-- HOROSCOPE A -->
+        <div class="horoscope-section">
+            <h2>Horoscope A (Initial Positions)</h2>
+            <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+                <div class="form-section" style="flex: 0 1 auto;" id="h1-planets-form">
+                    <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">Celestial Bodies
+                    </h3>
+                </div>
+                <div style="flex: 0 1 auto; display: flex; flex-direction: column; gap: 15px;">
+                    <div class="form-section" id="h1-houses-form">
+                        <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">House Cusps
+                            (1-6)</h3>
+                    </div>
+                    <div class="form-section" id="h1-angles-form">
+                        <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">AC & MC</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOROSCOPE B -->
+        <div class="horoscope-section">
+            <h2>Horoscope B (Secondary Positions)</h2>
+            <p style="text-align: center; margin-bottom: 10px; font-size: 0.9em; opacity: 0.8;">Same houses and angles
+                as Horoscope A.</p>
+            <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+                <div class="form-section" style="flex: 0 1 auto;" id="h2-planets-form">
+                    <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">Celestial
+                        Bodies</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOROSCOPE C -->
+        <div class="horoscope-section">
+            <h2>Horoscope C (Final Positions)</h2>
+            <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+                <div class="form-section" style="flex: 0 1 auto;" id="h3-planets-form">
+                    <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">Celestial Bodies
+                    </h3>
+                </div>
+                <div style="flex: 0 1 auto; display: flex; flex-direction: column; gap: 15px;">
+                    <div class="form-section" id="h3-houses-form">
+                        <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">House Cusps
+                            (1-6)</h3>
+                    </div>
+                    <div class="form-section" id="h3-angles-form">
+                        <h3 style="margin-bottom: 8px; color: var(--secondary-color); font-size: 1.1em;">AC & MC</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="generate-btn" onclick="startAnimation()">Generate Animation</button>
+    </div>
+
+    <!-- ANIMATION SCREEN -->
+    <div id="animation-screen">
+        <div id="anim-header">
+            <h1 id="anim-title"></h1>
+        </div>
+        <div id="anim-content">
+            <div id="anim-left-panel">
+                <div class="info-column" id="col-celestial">
+                    <h2>Celestial Bodies & Angles</h2>
+                    <div id="info-planets"></div>
+                    <div style="margin-top: 15px; border-top: 1px solid rgba(255, 255, 0, 0.3); padding-top: 15px;"
+                        id="info-angles"></div>
+                </div>
+                <div class="info-column" id="col-houses">
+                    <h2>House Cusps</h2>
+                    <div id="info-houses"></div>
+                </div>
+            </div>
+            <div id="anim-right-panel">
+                <div id="anim-date-display" style="position: absolute; top: 15px; right: 25px; color: white; text-shadow: 0 0 10px white, 0 0 20px white; font-size: 1.4rem; font-weight: bold; z-index: 10;"></div>
+                <canvas id="horoscope-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Configuration
+        const ZODIAC_SIGNS = [
+            { name: "Aries", symbol: "♈", angle: 0 },
+            { name: "Taurus", symbol: "♉", angle: 30 },
+            { name: "Gemini", symbol: "♊", angle: 60 },
+            { name: "Cancer", symbol: "♋", angle: 90 },
+            { name: "Leo", symbol: "♌", angle: 120 },
+            { name: "Virgo", symbol: "♍", angle: 150 },
+            { name: "Libra", symbol: "♎", angle: 180 },
+            { name: "Scorpio", symbol: "♏", angle: 210 },
+            { name: "Sagittarius", symbol: "♐", angle: 240 },
+            { name: "Capricorn", symbol: "♑", angle: 270 },
+            { name: "Aquarius", symbol: "♒", angle: 300 },
+            { name: "Pisces", symbol: "♓", angle: 330 }
+        ];
+
+        const PLANETS = [
+            { id: "sun", name: "Sun", symbol: "☉", color: "orange" },
+            { id: "moon", name: "Moon", symbol: "☽", color: "#FFF44F" },
+            { id: "mercury", name: "Mercury", symbol: "☿", color: "#00BFFF" },
+            { id: "venus", name: "Venus", symbol: "♀", color: "#FF69B4" },
+            { id: "mars", name: "Mars", symbol: "♂", color: "red" },
+            { id: "jupiter", name: "Jupiter", symbol: "♃", color: "#DAA520" },
+            { id: "saturn", name: "Saturn", symbol: "♄", color: "purple" },
+            { id: "uranus", name: "Uranus", symbol: "♅", color: "#4169E1" },
+            { id: "neptune", name: "Neptune", symbol: "♆", color: "#20B2AA" },
+            { id: "pluto", name: "Pluto", symbol: "⯓", color: "green" }
+        ];
+
+        // Draw Stars
+        let stars = [];
+        let starCanvas, starCtx;
+
+        function initStars() {
+            starCanvas = document.getElementById('star-canvas');
+            starCtx = starCanvas.getContext('2d');
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+
+            stars = [];
+            for (let i = 0; i < 800; i++) {
+                let rSelect = Math.random();
+                let r = rSelect > 0.9 ? 2.0 : (rSelect > 0.4 ? 1.2 : 0.5);
+
+                stars.push({
+                    x: Math.random() * starCanvas.width,
+                    y: Math.random() * starCanvas.height,
+                    r: r,
+                    alpha: Math.random(),
+                    speed: (Math.random() * 0.01 + 0.005) * (Math.random() > 0.5 ? 1 : -1)
+                });
+            }
+        }
+
+        function animateStars() {
+            starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+            stars.forEach(s => {
+                s.alpha += s.speed;
+                if (s.alpha > 1) { s.alpha = 1; s.speed *= -1; }
+                if (s.alpha < 0.1) { s.alpha = 0.1; s.speed *= -1; }
+
+                starCtx.beginPath();
+                starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                starCtx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                starCtx.fill();
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        initStars();
+        animateStars();
+        window.addEventListener('resize', initStars);
+
+        function getOrdinal(n) {
+            if (n === 1) return "1st";
+            if (n === 2) return "2nd";
+            if (n === 3) return "3rd";
+            return n + "th";
+        }
+
+        // Generate UI Forms
+        function createZodiacRadios(namePrefix, onChange) {
+            let html = '<div class="zodiac-radios">';
+            ZODIAC_SIGNS.forEach((z, i) => {
+                html += `<label><input type="radio" name="${namePrefix}_sign" value="${i}" style="display:none;" onchange="${onChange}"><span>${z.symbol}</span></label>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function buildPlanetsForm(containerId, prefix, includeRetrograde) {
+            const form = document.getElementById(containerId);
+            PLANETS.forEach(p => {
+                let extraHtml = includeRetrograde ? `<label class="retrograde-label"><input type="checkbox" id="${prefix}_planet_${p.id}_retro"> R</label>` : '';
+                form.innerHTML += `
+                    <div class="form-row" style="flex-wrap: nowrap; justify-content: flex-start;">
+                        <label style="color: ${p.color}; width: 120px;">${p.symbol} ${p.name}</label>
+                        ${createZodiacRadios(`${prefix}_planet_${p.id}`, '')}
+                        <input type="number" id="${prefix}_planet_${p.id}_deg" class="degree-input" min="0" max="29" value="0">°
+                        ${extraHtml}
+                    </div>
+                `;
+            });
+        }
+
+        function buildHousesForm(containerId, prefix) {
+            const form = document.getElementById(containerId);
+            for (let i = 1; i <= 6; i++) {
+                form.innerHTML += `
+                    <div class="form-row">
+                        <label style="width: 80px; font-size: 0.95em; white-space: nowrap;">${getOrdinal(i)} House</label>
+                        ${createZodiacRadios(`${prefix}_house_${i}`, `updateOppositeHouse('${prefix}', ${i})`)}
+                        <input type="number" id="${prefix}_house_${i}_deg" class="degree-input" min="0" max="29" value="0" oninput="updateOppositeHouse('${prefix}', ${i})">°
+                    </div>
+                `;
+            }
+        }
+
+        function buildAnglesForm(containerId, prefix) {
+            const form = document.getElementById(containerId);
+            const angleSettingsLabels = { 'AC': 'AC', 'MC': 'MC' };
+            ['AC', 'MC'].forEach(a => {
+                form.innerHTML += `
+                    <div class="form-row">
+                        <label style="width: 80px; font-size: 0.95em; white-space: nowrap;">${angleSettingsLabels[a]}</label>
+                        ${createZodiacRadios(`${prefix}_angle_${a}`, `updateOppositeAngle('${prefix}', '${a}')`)}
+                        <input type="number" id="${prefix}_angle_${a}_deg" class="degree-input" min="0" max="29" value="0" oninput="updateOppositeAngle('${prefix}', '${a}')">°
+                    </div>
+                `;
+            });
+        }
+
+        function initForms() {
+            // Horoscope A
+            buildPlanetsForm('h1-planets-form', 'h1', false);
+            buildHousesForm('h1-houses-form', 'h1');
+            buildAnglesForm('h1-angles-form', 'h1');
+
+            // Horoscope B
+            buildPlanetsForm('h2-planets-form', 'h2', true);
+
+            // Horoscope C
+            buildPlanetsForm('h3-planets-form', 'h3', false);
+            buildHousesForm('h3-houses-form', 'h3');
+            buildAnglesForm('h3-angles-form', 'h3');
+
+            // Default selection
+            document.querySelectorAll('.form-row').forEach(row => {
+                const firstRadio = row.querySelector('input[type="radio"]');
+                if (firstRadio) firstRadio.checked = true;
+            });
+
+            // Auto update opposites
+            ['h1', 'h3'].forEach(prefix => {
+                for (let i = 1; i <= 6; i++) updateOppositeHouse(prefix, i);
+                updateOppositeAngle(prefix, 'AC');
+                updateOppositeAngle(prefix, 'MC');
+            });
+        }
+
+        function updateOppositeHouse(prefix, h) {
+            // Unused hook for consistency
+        }
+
+        function updateOppositeAngle(prefix, a) {
+            // Unused hook for consistency
+        }
+
+        initForms();
+
+        // Data Extraction
+        let chartData = {
+            h1: { planets: [], houses: [], angles: {} },
+            h2: { planets: [] },
+            h3: { planets: [], houses: [], angles: {} },
+            intervalDays: 0,
+            siderealDaysCount: 0,
+            dateAStr: '',
+            dateCStr: ''
+        };
+
+        function getZodiacFromRadios(name) {
+            let el = document.querySelector(`input[name="${name}"]:checked`);
+            return el ? parseInt(el.value) : 0;
+        }
+
+        function extractPlanets(prefix, includeRetrograde) {
+            return PLANETS.map(p => {
+                let signIdx = getZodiacFromRadios(`${prefix}_planet_${p.id}_sign`);
+                let deg = parseInt(document.getElementById(`${prefix}_planet_${p.id}_deg`).value) || 0;
+                let absAngle = ZODIAC_SIGNS[signIdx].angle + deg;
+                let ret = { ...p, signIdx, sign: ZODIAC_SIGNS[signIdx], deg, absAngle };
+                if (includeRetrograde) {
+                    ret.retrograde = document.getElementById(`${prefix}_planet_${p.id}_retro`).checked;
+                }
+                return ret;
+            });
+        }
+
+        function extractHouses(prefix) {
+            let houses = [];
+            for (let i = 1; i <= 6; i++) {
+                let signIdx = getZodiacFromRadios(`${prefix}_house_${i}_sign`);
+                let deg = parseInt(document.getElementById(`${prefix}_house_${i}_deg`).value) || 0;
+                let absAngle = ZODIAC_SIGNS[signIdx].angle + deg;
+                houses[i - 1] = { num: i, signIdx, sign: ZODIAC_SIGNS[signIdx], deg, absAngle };
+
+                let oppSignIdx = (signIdx + 6) % 12;
+                let oppAbsAngle = (absAngle + 180) % 360;
+                houses[i + 5] = { num: i + 6, signIdx: oppSignIdx, sign: ZODIAC_SIGNS[oppSignIdx], deg, absAngle: oppAbsAngle };
+            }
+            return houses;
+        }
+
+        function extractAngles(prefix) {
+            let angles = {};
+            ['AC', 'MC'].forEach(a => {
+                let signIdx = getZodiacFromRadios(`${prefix}_angle_${a}_sign`);
+                let deg = parseInt(document.getElementById(`${prefix}_angle_${a}_deg`).value) || 0;
+                let absAngle = ZODIAC_SIGNS[signIdx].angle + deg;
+                angles[a] = { signIdx, sign: ZODIAC_SIGNS[signIdx], deg, absAngle };
+
+                let oppA = a === 'AC' ? 'DC' : 'IC';
+                let oppSignIdx = (signIdx + 6) % 12;
+                let oppAbsAngle = (absAngle + 180) % 360;
+                angles[oppA] = { signIdx: oppSignIdx, sign: ZODIAC_SIGNS[oppSignIdx], deg, absAngle: oppAbsAngle };
+            });
+            return angles;
+        }
+
+        function calculateTimeB() {
+            const timeAInput = document.getElementById('timeA').value;
+            const timeCInput = document.getElementById('timeC').value;
+
+            if (!timeAInput || !timeCInput) {
+                alert("Please enter both Date & Time A and C.");
+                return;
+            }
+
+            const dateA = new Date(timeAInput);
+            const dateC = new Date(timeCInput);
+
+            if (dateC <= dateA) {
+                alert("Date & Time C must be after Date & Time A.");
+                return;
+            }
+
+            const SIDEREAL_DAY_MS = 86164090.53;
+            const timeDiff = dateC.getTime() - dateA.getTime();
+            const siderealDaysCount = Math.floor(timeDiff / SIDEREAL_DAY_MS);
+            
+            const timeBMs = dateA.getTime() + (siderealDaysCount * SIDEREAL_DAY_MS);
+            const dateB = new Date(timeBMs);
+
+            const formatDateTime = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            };
+
+            document.getElementById('resultTime').textContent = formatDateTime(dateB);
+
+            const totalSolarDays = (siderealDaysCount * SIDEREAL_DAY_MS) / 86400000;
+            const intervalYears = Math.floor(totalSolarDays / 365.25);
+            const intervalDays = Math.round(totalSolarDays - intervalYears * 365.25);
+
+            document.getElementById('resultInterval').innerHTML = `Time Interval (A to B): <span style="color: var(--accent-color);">${intervalYears}</span> Years <span style="color: var(--accent-color);">${intervalDays}</span> Days`;
+            
+            document.getElementById('resultBox').style.display = 'block';
+        }
+
+        function startAnimation() {
+            const timeAInput = document.getElementById('timeA').value;
+            const timeCInput = document.getElementById('timeC').value;
+
+            if (!timeAInput || !timeCInput) {
+                alert("Please enter both Date & Time A and C.");
+                return;
+            }
+
+            const dateA = new Date(timeAInput);
+            const dateC = new Date(timeCInput);
+
+            if (dateC <= dateA) {
+                alert("Date & Time C must be after Date & Time A.");
+                return;
+            }
+
+            const SIDEREAL_DAY_MS = 86164090.53;
+            const timeDiff = dateC.getTime() - dateA.getTime();
+            chartData.siderealDaysCount = Math.floor(timeDiff / SIDEREAL_DAY_MS);
+            chartData.intervalDays = (chartData.siderealDaysCount * SIDEREAL_DAY_MS) / 86400000;
+
+            const formatDateTime = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            };
+            chartData.dateAStr = formatDateTime(dateA);
+            chartData.dateCStr = formatDateTime(dateC);
+
+            document.getElementById('anim-title').innerText = document.getElementById('input-title').value;
+            document.getElementById('anim-date-display').innerText = chartData.dateAStr;
+
+            chartData.h1.planets = extractPlanets('h1', false);
+            chartData.h1.houses = extractHouses('h1');
+            chartData.h1.angles = extractAngles('h1');
+
+            chartData.h2.planets = extractPlanets('h2', true);
+
+            chartData.h3.planets = extractPlanets('h3', false);
+            chartData.h3.houses = extractHouses('h3');
+            chartData.h3.angles = extractAngles('h3');
+
+            document.getElementById('settings-screen').style.display = 'none';
+            document.getElementById('animation-screen').style.display = 'flex';
+
+            setTimeout(runAnimationSequence, 100);
+        }
+
+        function populateInfoColumns(dataPhase) {
+            // Planets
+            let phtml = '';
+            dataPhase.planets.forEach(p => {
+                let extraTxt = p.retrograde ? ' <span style="font-size:0.8em; color:red;">[R]</span>' : '';
+                phtml += `<div class="info-grid" id="info-planet-${p.id}">
+                    <span class="info-symbol" style="color: ${p.color};">${p.symbol}</span>
+                    <span style="color: ${p.color};">${p.name}${extraTxt}</span>
+                    <span>${p.sign.symbol}</span>
+                    <span>${p.sign.name}</span>
+                    <span>${p.deg}°</span>
+                </div>`;
+            });
+            document.getElementById('info-planets').innerHTML = phtml;
+
+            // Angles
+            let ahtml = '';
+            const allAngleLabels = { 'AC': 'AC 1st House', 'DC': 'DC 7th House', 'MC': 'MC 10th House', 'IC': 'IC 4th House' };
+            ['AC', 'DC', 'MC', 'IC'].forEach(a => {
+                let ang = dataPhase.angles[a];
+                ahtml += `<div class="info-grid">
+                    <span></span>
+                    <span>${allAngleLabels[a]}</span>
+                    <span>${ang.sign.symbol}</span>
+                    <span>${ang.sign.name}</span>
+                    <span>${ang.deg}°</span>
+                </div>`;
+            });
+            document.getElementById('info-angles').innerHTML = ahtml;
+
+            // Houses
+            let hhtml = '';
+            dataPhase.houses.forEach(h => {
+                hhtml += `<div class="info-grid-house">
+                    <span>${getOrdinal(h.num)} House</span>
+                    <span>${h.sign.symbol}</span>
+                    <span>${h.sign.name}</span>
+                    <span>${h.deg}°</span>
+                </div>`;
+            });
+            document.getElementById('info-houses').innerHTML = hhtml;
+        }
+
+        // Global layout metrics
+        let cw, ch, cx, cy, r;
+        let currentAscOffset;
+
+        function drawHoroscope(dataPhase, zodiacRotationOffset = 0) {
+            const canvas = document.getElementById('horoscope-canvas');
+            const parent = canvas.parentElement;
+
+            let size = Math.min(parent.clientWidth, parent.clientHeight) - 40;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            cw = size; ch = size;
+            cx = size / 2; cy = size / 2;
+
+            let maxR = size / 2 - 20;
+            r = maxR / 5.2;
+
+            let ascRad = (dataPhase.angles['AC'].absAngle * Math.PI) / 180;
+            currentAscOffset = Math.PI - ascRad;
+
+            ctx.clearRect(0, 0, cw, ch);
+            ctx.translate(cx, cy);
+
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 1;
+
+            let radii = [r * 0.1, r, r * 4, r * 4.5, r * 5];
+
+            radii.forEach(rad => {
+                ctx.beginPath();
+                ctx.arc(0, 0, rad, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            // Draw white shining star in the center
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.1, 0, Math.PI * 2);
+            ctx.fillStyle = "white";
+            ctx.shadowColor = "white";
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0; // reset
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            for (let i = 0; i < 12; i++) {
+                let startAngle = i * 30 * Math.PI / 180 + currentAscOffset + zodiacRotationOffset;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(startAngle) * r * 4, -Math.sin(startAngle) * r * 4);
+                ctx.lineTo(Math.cos(startAngle) * r * 4.5, -Math.sin(startAngle) * r * 4.5);
+                ctx.stroke();
+
+                let midAngle = startAngle + (15 * Math.PI / 180);
+                let sr = r * 4.25;
+                ctx.font = `${r * 0.35}px Arial`;
+                ctx.fillStyle = "white";
+                ctx.fillText(ZODIAC_SIGNS[i].symbol, Math.cos(midAngle) * sr, -Math.sin(midAngle) * sr);
+            }
+
+            dataPhase.houses.forEach(h => {
+                let hRad = (h.absAngle * Math.PI / 180) + currentAscOffset; // Not affected by zodiac rotation
+
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(hRad) * r * 0.1, -Math.sin(hRad) * r * 0.1);
+                ctx.lineTo(Math.cos(hRad) * r * 4, -Math.sin(hRad) * r * 4);
+
+                if (h.num === 1 || h.num === 7) {
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([]);
+                } else if (h.num === 4 || h.num === 10) {
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                } else {
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([]);
+                }
+                ctx.stroke();
+
+                let nextH = dataPhase.houses.find(nh => nh.num === (h.num % 12) + 1);
+                let nextRad = (nextH.absAngle * Math.PI / 180) + currentAscOffset;
+
+                if (nextRad < hRad) nextRad += Math.PI * 2;
+
+                let midHRad = (hRad + nextRad) / 2;
+                ctx.font = `${r * 0.3}px Arial`;
+                ctx.fillStyle = "white";
+                ctx.fillText(h.num.toString(), Math.cos(midHRad) * r * 0.55, -Math.sin(midHRad) * r * 0.55);
+            });
+            ctx.setLineDash([]);
+
+            const angleCanvasLabels = { 'AC': 'AC', 'DC': 'DC', 'MC': 'MC', 'IC': 'IC' };
+            ['AC', 'DC', 'MC', 'IC'].forEach(a => {
+                let ang = dataPhase.angles[a];
+                let aRad = (ang.absAngle * Math.PI / 180) + currentAscOffset;
+                let lr = r * 4.75;
+                ctx.font = `bold ${r * 0.25}px Arial`;
+                ctx.fillText(angleCanvasLabels[a], Math.cos(aRad) * lr, -Math.sin(aRad) * lr);
+            });
+
+            ctx.translate(-cx, -cy);
+        }
+
+        let currentPlanetElements = {};
+
+        async function animatePhase(dataPhase, isPhase3 = false) {
+            populateInfoColumns(dataPhase);
+            drawHoroscope(dataPhase, 0);
+
+            let placedPlanets = [];
+            const canvasElement = document.getElementById('horoscope-canvas');
+            const canvasRect = canvasElement.getBoundingClientRect();
+
+            for (let i = 0; i < dataPhase.planets.length; i++) {
+                let p = dataPhase.planets[i];
+                let infoEl = document.getElementById(`info-planet-${p.id}`);
+
+                infoEl.classList.add('blinking');
+                await wait(1500);
+                infoEl.classList.remove('blinking');
+
+                let pRad = (p.absAngle * Math.PI / 180) + currentAscOffset;
+
+                let baseDrawR = r * 3.8;
+                let drawR = baseDrawR;
+
+                let offsetStep = r * 0.4;
+                while (true) {
+                    let overlapping = placedPlanets.find(pp => {
+                        let angleDiff = Math.abs(pRad - pp.rad);
+                        if (angleDiff > Math.PI) angleDiff = Math.PI * 2 - angleDiff;
+                        return angleDiff < (5 * Math.PI / 180) && Math.abs(drawR - pp.drawR) < offsetStep * 0.5;
+                    });
+
+                    if (overlapping) {
+                        drawR -= offsetStep;
+                    } else {
+                        break;
+                    }
+                }
+
+                placedPlanets.push({ id: p.id, rad: pRad, drawR: drawR });
+
+                let finalX = canvasRect.left + cx + Math.cos(pRad) * drawR;
+                let finalY = canvasRect.top + cy - Math.sin(pRad) * drawR;
+
+                let pEl = document.createElement('div');
+                pEl.className = 'animated-planet css-move';
+                pEl.innerText = p.symbol;
+                pEl.style.color = p.color;
+
+                let infoRect = infoEl.querySelector('.info-symbol').getBoundingClientRect();
+                pEl.style.left = (infoRect.left + infoRect.width / 2) + 'px';
+                pEl.style.top = (infoRect.top + infoRect.height / 2) + 'px';
+
+                document.body.appendChild(pEl);
+                currentPlanetElements[p.id] = pEl;
+
+                void pEl.offsetWidth;
+
+                pEl.style.left = finalX + 'px';
+                pEl.style.top = finalY + 'px';
+
+                // Save initial state for Phase 2 use if it's Phase 1
+                if (!isPhase3) {
+                    pEl.dataset.rad = pRad;
+                    pEl.dataset.drawR = drawR;
+                }
+
+                await wait(3000);
+            }
+            return placedPlanets;
+        }
+
+        async function runAnimationSequence() {
+            // PHASE 1
+            await animatePhase(chartData.h1, false);
+
+            await wait(2000); // small pause before Phase 2
+
+            // PHASE 2 (Movement from HA to HB)
+            const canvasElement = document.getElementById('horoscope-canvas');
+            const canvasRect = canvasElement.getBoundingClientRect();
+
+            let h2PlanetsMap = {};
+            chartData.h2.planets.forEach(p => { h2PlanetsMap[p.id] = p; });
+
+            let phase2Planets = [];
+
+            chartData.h1.planets.forEach(p => {
+                let pEl = currentPlanetElements[p.id];
+                if (!pEl) return;
+
+                let h2Data = h2PlanetsMap[p.id];
+                let startRad = parseFloat(pEl.dataset.rad);
+                let drawR = parseFloat(pEl.dataset.drawR);
+                let targetRadRaw = (h2Data.absAngle * Math.PI / 180) + currentAscOffset;
+
+                let targetRad = targetRadRaw;
+                let distanceRad = 0;
+
+                startRad = (startRad % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                targetRad = (targetRad % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+
+                if (h2Data.retrograde) {
+                    if (targetRad > startRad) {
+                        targetRad -= Math.PI * 2;
+                    }
+                    distanceRad = startRad - targetRad;
+                } else {
+                    if (targetRad < startRad) {
+                        targetRad += Math.PI * 2;
+                    }
+                    distanceRad = targetRad - startRad;
+                }
+
+                const AVERAGE_SPEEDS = {
+                    "sun": 360 / 365.24219,
+                    "moon": 360 / 27.32158,
+                    "mercury": 360 / 365.24219,
+                    "venus": 360 / 365.24219,
+                    "mars": 360 / 686.971,
+                    "jupiter": 360 / (11.862 * 365.25),
+                    "saturn": 360 / (29.457 * 365.25),
+                    "uranus": 360 / (84.011 * 365.25),
+                    "neptune": 360 / (164.79 * 365.25),
+                    "pluto": 360 / (247.94 * 365.25)
+                };
+
+                let extraRevs = 0;
+                if (AVERAGE_SPEEDS[p.id]) {
+                    let expectedDeg = AVERAGE_SPEEDS[p.id] * chartData.intervalDays;
+                    let expectedRad = expectedDeg * Math.PI / 180;
+
+                    let remainingRad = expectedRad - distanceRad;
+                    if (remainingRad > 0) {
+                        extraRevs = Math.round(remainingRad / (Math.PI * 2));
+                        if (extraRevs < 0) extraRevs = 0;
+                    }
+                }
+
+                if (h2Data.retrograde) {
+                    targetRad -= extraRevs * Math.PI * 2;
+                } else {
+                    targetRad += extraRevs * Math.PI * 2;
+                }
+
+                pEl.classList.remove('css-move'); // Use JS for arc movement
+
+                phase2Planets.push({
+                    el: pEl,
+                    startRad: startRad,
+                    targetRad: targetRad,
+                    drawR: drawR
+                });
+            });
+
+            await new Promise(resolve => {
+                let startTime = null;
+                const duration = 18000; // 18 seconds duration
+                const totalZodiacRotation = -chartData.siderealDaysCount * Math.PI * 2; // clockwise
+
+                function animateArc(time) {
+                    if (!startTime) startTime = time;
+                    let progress = (time - startTime) / duration;
+                    if (progress > 1) progress = 1;
+
+                    let easeProgress = progress; // Linear easing
+
+                    let currentZodiacOffset = totalZodiacRotation * easeProgress;
+                    drawHoroscope(chartData.h1, currentZodiacOffset);
+
+                    phase2Planets.forEach(pData => {
+                        let currentRad = pData.startRad + (pData.targetRad - pData.startRad) * easeProgress;
+                        let currentX = canvasRect.left + cx + Math.cos(currentRad) * pData.drawR;
+                        let currentY = canvasRect.top + cy - Math.sin(currentRad) * pData.drawR;
+
+                        pData.el.style.left = currentX + 'px';
+                        pData.el.style.top = currentY + 'px';
+                    });
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateArc);
+                    } else {
+                        resolve();
+                    }
+                }
+                requestAnimationFrame(animateArc);
+            });
+
+            // PHASE 3 wait
+            await wait(7000);
+
+            document.getElementById('anim-date-display').innerText = chartData.dateCStr;
+
+            // Remove existing planets
+            for (let id in currentPlanetElements) {
+                let el = currentPlanetElements[id];
+                if (el && el.parentNode) {
+                    el.style.transition = 'opacity 1s ease';
+                    el.style.opacity = '0';
+                    setTimeout(() => el.remove(), 1000);
+                }
+            }
+            currentPlanetElements = {};
+
+            await wait(1000); // Wait for fade out
+
+            // PHASE 3 (Final Horoscope)
+            await animatePhase(chartData.h3, true);
+        }
+
+        function wait(ms) {
+            return new Promise(res => setTimeout(res, ms));
+        }
+
+    </script>
+</body>
+
+</html>

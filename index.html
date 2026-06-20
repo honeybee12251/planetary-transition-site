@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<title>Transition of the Celestial Bodies</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    line-height: 1.8;
+}
+
+h1{
+    text-align:center;
+}
+
+.app-box{
+    border:1px solid #ccc;
+    border-radius:10px;
+    padding:20px;
+    margin:20px 0;
+}
+
+.button{
+    display:inline-block;
+    background:#0078d7;
+    color:white;
+    padding:10px 20px;
+    text-decoration:none;
+    border-radius:5px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Transition of the Celestial Bodies</h1>
+
+ホロスコープ上の惑星（10天体）の移動を表現するWebアプリです。
+12星座（サイン）も経過した日数分回転します。
+
+
+<div class="app-box">
+<h2>Planetary Transition (CSV Data)</h2>
+
+<p>
+Astro-Seek.comでホロスコープの情報をCSV形式で取得しアニメーションを作成するアプリです。
+</p>
+<p>
+（本アプリはAstro-Seek.comとは無関係の独立したプロジェクトです。惑星とハウスの位置情報はユーザーがAstro-Seek.comから手動で取得して入力します。)
+</p>
+
+<h3>使い方</h3>
+
+<ol>
+<li>アニメーションのタイトルを入力</li>
+<li>Horoscope A（開始）の日時を入力</li>
+<li>Horoscope C（終了）の日時を入力</li>
+<li>Horoscope B（ホロスコープCの直前の日時でハウスとアングルがホロスコープAと同じ位置に来る時間）が自動で表示される</li>
+<li>Astro-Seek.comでホロスコープA, B, Cを作成し、Copy PositionsをクリックしてCSVデータをコピー、貼り付け欄にペーストする</li>
+<li>ホロスコープAからBにかけて惑星が逆行している場合はホロスコープBのRにチェックを入れる</li>
+<li>Generate Animationボタンを押す</li>
+</ol>
+
+<a href="planetary_transition_(csv_data).html" class="button">
+Planetary Transition (CSV Data) を開く
+</a>
+
+</div>
+
+<div class="app-box">
+
+<h2>Planetary Transition (Manual Input)</h2>
+
+<p>
+ご自身の使用されているサイトなどからホロスコープの情報を取得し、手動で入力してアニメーションを作成するアプリです。
+</p>
+
+<h3>使い方</h3>
+
+<ol>
+<li>アニメーションのタイトルを入力</li>
+<li>Horoscope A（開始）の日時を入力</li>
+<li>Horoscope C（終了）の日時を入力</li>
+<li>Horoscope B（ホロスコープCの直前の日時でハウスとアングルがホロスコープAと同じ位置に来る時間）が表示される</li>
+<li>ホロスコープのAの惑星とハウスの情報を入力（アングルは度（°）の単位までです）</li>
+<li>ホロスコープのBの惑星の情報を入力（ホロスコープAからBにかけて惑星が逆行している場合はRにチェックを入れる）</li>
+<li>ホロスコープCの惑星とハウスの情報を入力</li>
+<li>Generate Animationボタンを押す</li>
+</ol>
+
+<a href="planetary_transition_(manual_input).html" class="button">
+Planetary Transition (Manual Input) を開く
+</a>
+
+</div>
+
+</body>
+</html>
