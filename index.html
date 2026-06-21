@@ -12,6 +12,8 @@ body{
     margin: auto;
     padding: 20px;
     line-height: 1.8;
+    background-color: #FFF8DC;
+    color: #000000;
 }
 
 h1{
@@ -27,7 +29,7 @@ h1{
 
 .button{
     display:inline-block;
-    background:#0078d7;
+    background:#B57EDC;
     color:white;
     padding:10px 20px;
     text-decoration:none;
@@ -41,9 +43,15 @@ h1{
 
 <h1>Transition of the Celestial Bodies</h1>
 
+<p>
 ホロスコープ上の惑星（10天体）の移動を表現するWebアプリです。
 12星座（サイン）も経過した日数分回転します。
+</p>
 
+<p>
+This is a web application that visualizes the movement of the ten planets on a horoscope.
+The twelve zodiac signs also rotate according to the number of elapsed days.
+</p>
 
 <div class="app-box">
 <h2>Planetary Transition (CSV Data)</h2>
@@ -52,8 +60,16 @@ h1{
 Astro-Seek.comでホロスコープの情報をCSV形式で取得しアニメーションを作成するアプリです。
 </p>
 <p>
+It is an application that creates an animation using horoscope data obtained in CSV format from Astro-Seek.com.
+</p>
+<p>
 （本アプリはAstro-Seek.comとは無関係の独立したプロジェクトです。惑星とハウスの位置情報はユーザーがAstro-Seek.comから手動で取得して入力します。)
 </p>
+<p>
+(This application is an independent project and is not affiliated with Astro-Seek.com.
+Users manually obtain planetary and house position data from Astro-Seek.com and enter it into the app.)
+</p>
+
 
 <h3>使い方</h3>
 
@@ -61,14 +77,27 @@ Astro-Seek.comでホロスコープの情報をCSV形式で取得しアニメー
 <li>アニメーションのタイトルを入力</li>
 <li>Horoscope A（開始）の日時を入力</li>
 <li>Horoscope C（終了）の日時を入力</li>
-<li>Horoscope B（ホロスコープCの直前の日時でハウスとアングルがホロスコープAと同じ位置に来る時間）が自動で表示される</li>
+<li>Horoscope B（ホロスコープCの直前の日時でハウスとアングルがホロスコープAと同じ位置に来る時間）が自動で表示される（僅かに度数のずれが生じる場合があります）</li>
 <li>Astro-Seek.comでホロスコープA, B, Cを作成し、Copy PositionsをクリックしてCSVデータをコピー、貼り付け欄にペーストする</li>
 <li>ホロスコープAからBにかけて惑星が逆行している場合はホロスコープBのRにチェックを入れる</li>
 <li>Generate Animationボタンを押す</li>
 </ol>
 
+<h3>User Guide</h3>
+
+<ol>
+<li>Enter the title of the animation</li>
+<li>Enter the date and time of Horoscope A (start)</li>
+<li>Enter the date and time of Horoscope C (end)</li>
+<li>Horoscope B (the moment just before Horoscope C when the houses and angles return to the same positions as in Horoscope A) is displayed automatically (a slight degree discrepancy may occur)</li>
+<li>On Astro-Seek.com, generate horoscopes A, B, and C, click “Copy Positions,” copy the CSV data, and paste it into the input fields</li>
+<li>If any planet is retrograde between Horoscope A and Horoscope B, check the “R” box for Horoscope B</li>
+<li>Click the “Generate Animation” button</li>
+</ol>
+
 <a href="planetary_transition_(csv_data).html" class="button">
 Planetary Transition (CSV Data) を開く
+/ Open Planetary Transition (CSV Data)
 </a>
 
 </div>
@@ -80,6 +109,9 @@ Planetary Transition (CSV Data) を開く
 <p>
 ご自身の使用されているサイトなどからホロスコープの情報を取得し、手動で入力してアニメーションを作成するアプリです。
 </p>
+<p>
+This is an application that allows you to obtain horoscope information from the site you normally use, enter it manually, and generate an animation.
+</p>
 
 <h3>使い方</h3>
 
@@ -87,15 +119,30 @@ Planetary Transition (CSV Data) を開く
 <li>アニメーションのタイトルを入力</li>
 <li>Horoscope A（開始）の日時を入力</li>
 <li>Horoscope C（終了）の日時を入力</li>
-<li>Horoscope B（ホロスコープCの直前の日時でハウスとアングルがホロスコープAと同じ位置に来る時間）が表示される</li>
+<li>Horoscope B（ホロスコープCの直前の日時でハウスとアングルがホロスコープAと同じ位置に来る時間）が表示される（僅かに度数のずれが生じる場合があります）</li>
 <li>ホロスコープのAの惑星とハウスの情報を入力（アングルは度（°）の単位までです）</li>
 <li>ホロスコープのBの惑星の情報を入力（ホロスコープAからBにかけて惑星が逆行している場合はRにチェックを入れる）</li>
 <li>ホロスコープCの惑星とハウスの情報を入力</li>
 <li>Generate Animationボタンを押す</li>
 </ol>
 
+<h3>User Guide</h3>
+
+<ol>
+<li>Enter the title of the animation</li>
+<li>Enter the date and time of Horoscope A (start)</li>
+<li>Enter the date and time of Horoscope C (end)</li>
+<li>Horoscope B (the moment just before Horoscope C when the houses and angles return to the same positions as in Horoscope A) is displayed automatically (a slight degree discrepancy may occur)</li>
+<li>Enter the planetary and house information for Horoscope A (angles are specified to the degree level)</li>
+<li>Enter the planetary information for Horoscope B (if any planet is retrograde between Horoscope A and Horoscope B, check the “R” box for Horoscope B)</li>
+<li>Enter the date and time of Horoscope C (end)</li>
+<li>Click the “Generate Animation” button</li>
+</ol>
+
 <a href="planetary_transition_(manual_input).html" class="button">
 Planetary Transition (Manual Input) を開く
+/ Open Planetary Transition (Manual Input)
+
 </a>
 
 </div>
